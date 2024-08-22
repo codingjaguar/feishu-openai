@@ -23,6 +23,20 @@ func TestCompletions(t *testing.T) {
 	fmt.Println(resp.Content, resp.Role)
 }
 
+func TestRAGCompletions(t *testing.T) {
+	config := initialization.LoadConfig("../../config.yaml")
+	msgs := []Messages{
+		{Role: "system", Content: "Human: You are an AI assistant. You are able to find answers to the questions from the contextual passage snippets provided."},
+		{Role: "user", Content: "what is whyhow?"},
+	}
+	gpt := NewChatGPT(*config)
+	resp, err := gpt.Completions(msgs, Balance)
+	if err != nil {
+		t.Errorf("TestCompletions failed with error: %v", err)
+	}
+	fmt.Println(resp.Content)
+}
+
 func TestVisionOnePic(t *testing.T) {
 	config := initialization.LoadConfig("../../config.yaml")
 	content := []ContentType{

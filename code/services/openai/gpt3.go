@@ -2,6 +2,7 @@ package openai
 
 import (
 	"errors"
+	"fmt"
 	"start-feishubot/logger"
 	"strings"
 
@@ -70,6 +71,29 @@ func (msg *Messages) CalculateTokenLength() int {
 
 func (gpt *ChatGPT) Completions(msg []Messages, aiMode AIMode) (resp Messages,
 	err error) {
+	// Hack to force change the system prompt.
+	systemPromptForRAG := "Human: You are an AI assistant. You are able to find answers to the questions from the contextual passage snippets provided."
+	msg[0].Content = systemPromptForRAG
+	// Augment user's original question by doing RAG.
+	rawQuery := msg[1].Content
+	retrievedChunks, err := gpt.ZillizClient.Retrieve(rawQuery, 3)
+	if err != nil {
+		logger.Errorf("ERROR %v", err)
+		resp = Messages{}
+		err = errors.New("retrieval with Zilliz Cloud Pipeline failed")
+		return resp, err
+	}
+	userPrompt := fmt.Sprintf(`
+		Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
+		<context>
+		%s
+		</context>
+		<question>
+		%s
+		</question>`, strings.Join(retrievedChunks, " "), rawQuery)
+	msg[1].Content = userPrompt
+
+	// Compose gpt request.
 	requestBody := ChatGPTRequestBody{
 		Model:            gpt.Model,
 		Messages:         msg,
@@ -81,7 +105,7 @@ func (gpt *ChatGPT) Completions(msg []Messages, aiMode AIMode) (resp Messages,
 	}
 	gptResponseBody := &ChatGPTResponseBody{}
 	url := gpt.FullUrl("chat/completions")
-	//fmt.Println(url)
+	fmt.Println(requestBody)
 	logger.Debug(url)
 	logger.Debug("request body ", requestBody)
 	if url == "" {

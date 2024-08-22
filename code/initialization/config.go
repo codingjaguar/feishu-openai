@@ -38,6 +38,9 @@ type Config struct {
 	AzureResourceName          string
 	AzureOpenaiToken           string
 	StreamMode                 bool
+	ZillizAPIKey               string
+	ZillizPipelineID           string
+	ZillizRegion               string
 }
 
 var (
@@ -89,6 +92,9 @@ func LoadConfig(cfg string) *Config {
 		AzureResourceName:          getViperStringValue("AZURE_RESOURCE_NAME", ""),
 		AzureOpenaiToken:           getViperStringValue("AZURE_OPENAI_TOKEN", ""),
 		StreamMode:                 getViperBoolValue("STREAM_MODE", false),
+		ZillizAPIKey:               getViperStringValue("ZILLIZ_API_KEY", ""),
+		ZillizPipelineID:           getViperStringValue("ZILLIZ_PIPELINE_ID", ""),
+		ZillizRegion:               getViperStringValue("ZILLIZ_REGION", ""),
 	}
 
 	return config
@@ -102,8 +108,8 @@ func getViperStringValue(key string, defaultValue string) string {
 	return value
 }
 
-//OPENAI_KEY: sk-xxx,sk-xxx,sk-xxx
-//result:[sk-xxx sk-xxx sk-xxx]
+// OPENAI_KEY: sk-xxx,sk-xxx,sk-xxx
+// result:[sk-xxx sk-xxx sk-xxx]
 func getViperStringArray(key string, defaultValue []string) []string {
 	value := viper.GetString(key)
 	if value == "" {

@@ -12,6 +12,7 @@ import (
 	"start-feishubot/initialization"
 	"start-feishubot/logger"
 	"start-feishubot/services/loadbalancer"
+	"start-feishubot/services/zilliz"
 	"strings"
 	"time"
 )
@@ -38,14 +39,15 @@ type AzureConfig struct {
 }
 
 type ChatGPT struct {
-	Lb          *loadbalancer.LoadBalancer
-	ApiKey      []string
-	ApiUrl      string
-	HttpProxy   string
-	Model       string
-	MaxTokens   int
-	Platform    PlatForm
-	AzureConfig AzureConfig
+	Lb           *loadbalancer.LoadBalancer
+	ApiKey       []string
+	ApiUrl       string
+	HttpProxy    string
+	Model        string
+	MaxTokens    int
+	Platform     PlatForm
+	AzureConfig  AzureConfig
+	ZillizClient *zilliz.ZillizPipelineClient
 }
 type requestBodyType int
 
@@ -193,6 +195,7 @@ func (gpt *ChatGPT) sendRequestWithBodyType(link, method string,
 
 func NewChatGPT(config initialization.Config) *ChatGPT {
 	var lb *loadbalancer.LoadBalancer
+	zilliz := zilliz.NewZillizPipelineClient(config)
 	if config.AzureOn {
 		keys := []string{config.AzureOpenaiToken}
 		lb = loadbalancer.NewLoadBalancer(keys)
@@ -220,6 +223,7 @@ func NewChatGPT(config initialization.Config) *ChatGPT {
 			ApiVersion:     config.AzureApiVersion,
 			ApiToken:       config.AzureOpenaiToken,
 		},
+		ZillizClient: zilliz,
 	}
 }
 
