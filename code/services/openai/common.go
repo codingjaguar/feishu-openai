@@ -39,15 +39,16 @@ type AzureConfig struct {
 }
 
 type ChatGPT struct {
-	Lb           *loadbalancer.LoadBalancer
-	ApiKey       []string
-	ApiUrl       string
-	HttpProxy    string
-	Model        string
-	MaxTokens    int
-	Platform     PlatForm
-	AzureConfig  AzureConfig
-	ZillizClient *zilliz.ZillizPipelineClient
+	Lb            *loadbalancer.LoadBalancer
+	ApiKey        []string
+	ApiUrl        string
+	HttpProxy     string
+	Model         string
+	MaxTokens     int
+	Platform      PlatForm
+	AzureConfig   AzureConfig
+	ZillizClient  *zilliz.ZillizPipelineClient
+	RetrievalTopk int
 }
 type requestBodyType int
 
@@ -223,7 +224,8 @@ func NewChatGPT(config initialization.Config) *ChatGPT {
 			ApiVersion:     config.AzureApiVersion,
 			ApiToken:       config.AzureOpenaiToken,
 		},
-		ZillizClient: zilliz,
+		ZillizClient:  zilliz,
+		RetrievalTopk: config.RetrievalTopk,
 	}
 }
 

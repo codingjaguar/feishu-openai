@@ -76,7 +76,7 @@ func (gpt *ChatGPT) Completions(msg []Messages, aiMode AIMode) (resp Messages,
 	msg[0].Content = systemPromptForRAG
 	// Augment user's original question by doing RAG.
 	rawQuery := msg[1].Content
-	retrievedChunks, err := gpt.ZillizClient.Retrieve(rawQuery, 3)
+	retrievedChunks, err := gpt.ZillizClient.Retrieve(rawQuery, gpt.RetrievalTopk)
 	if err != nil {
 		logger.Errorf("ERROR %v", err)
 		resp = Messages{}
@@ -105,8 +105,6 @@ func (gpt *ChatGPT) Completions(msg []Messages, aiMode AIMode) (resp Messages,
 	}
 	gptResponseBody := &ChatGPTResponseBody{}
 	url := gpt.FullUrl("chat/completions")
-	fmt.Println(requestBody)
-	logger.Debug(url)
 	logger.Debug("request body ", requestBody)
 	if url == "" {
 		return resp, errors.New("无法获取openai请求地址")

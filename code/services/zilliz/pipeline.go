@@ -62,6 +62,7 @@ func NewZillizPipelineClient(config initialization.Config) *ZillizPipelineClient
 }
 
 func (zilliz *ZillizPipelineClient) Retrieve(question string, topk int) (chunks []string, err error) {
+	logger.Info("Topk: ", topk)
 	searchReq := SearchRequest{
 		Data: QueryData{
 			QueryText: question,

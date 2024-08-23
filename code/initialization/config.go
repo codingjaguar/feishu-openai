@@ -41,6 +41,7 @@ type Config struct {
 	ZillizAPIKey               string
 	ZillizPipelineID           string
 	ZillizRegion               string
+	RetrievalTopk              int
 }
 
 var (
@@ -95,6 +96,7 @@ func LoadConfig(cfg string) *Config {
 		ZillizAPIKey:               getViperStringValue("ZILLIZ_API_KEY", ""),
 		ZillizPipelineID:           getViperStringValue("ZILLIZ_PIPELINE_ID", ""),
 		ZillizRegion:               getViperStringValue("ZILLIZ_REGION", ""),
+		RetrievalTopk:              getViperIntValue("RETRIEVAL_TOPK", 5),
 	}
 
 	return config
